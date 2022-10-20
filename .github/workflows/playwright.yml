@@ -1,7 +1,7 @@
-name: Playwright Tests
+name: Apicurio Registry Operate First E2E Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   schedule:
     - cron: "*/30 * * * *"
 
@@ -29,4 +29,4 @@ jobs:
       with:
         name: playwright-report
         path: playwright-report/
-        retention-days: 30
+        retention-days: 1
