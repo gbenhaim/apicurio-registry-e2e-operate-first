@@ -17,6 +17,8 @@ jobs:
         cache: 'npm'
     - name: Install dependencies
       run: npm ci
+
+    # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
     - name: Get installed Playwright version
       id: playwright-version
       run: echo "::set-output name=version::$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" 
@@ -30,6 +32,7 @@ jobs:
     - name: Install Playwright's dependencies
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps
+
     - name: Run Playwright tests
       env:
         TEST_USERNAME: ${{ secrets.USERNAME }}
