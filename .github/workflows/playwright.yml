@@ -1,9 +1,9 @@
 name: Apicurio Registry Operate First E2E Tests
 on:
-  push:
-    branches: [ main ]
-  schedule:
-    - cron: "*/30 * * * *"
+  # push:
+  #   branches: [ main ]
+  # schedule:
+  #   - cron: "*/30 * * * *"
 
 jobs:
   test:
@@ -52,10 +52,11 @@ jobs:
         path: playwright-report/
         retention-days: 1
 
-    - name: Google Chat Notification
-      uses: Co-qn/google-chat-notification@releases/v1
-      with:
-        name: Operate First E2E Test
-        url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-        status: ${{ job.status }}
-      if: failure()
+    # Re-enable me on Monday
+    # - name: Google Chat Notification
+    #   uses: Co-qn/google-chat-notification@releases/v1
+    #   with:
+    #     name: Operate First E2E Test
+    #     url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+    #     status: ${{ job.status }}
+    #   if: failure()
