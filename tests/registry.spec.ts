@@ -76,7 +76,7 @@ test('clean existing registry instances', async ({ page }) => {
 // });
 
 test('create a registry instance create an artifact and delete everything', async ({ page, browserName }) => {
-  test.skip(browserName === 'firefox' && process.platform === 'darwin', 'The artifact content is pasted with spurious characters');
+  test.skip(browserName === 'webkit' && process.platform === 'darwin', 'The artifact content is pasted with spurious characters');
 
   await login(page);
 
@@ -92,7 +92,7 @@ test('create a registry instance create an artifact and delete everything', asyn
 
   const artifactContent = fs.readFileSync('./resources/petstore.yaml', { encoding: 'utf-8' });
 
-  // FIXME: fails on Safari locally
+  // FIXME: fails on Safari
   await page.locator('#artifact-content').fill(artifactContent);
 
   // FIXME: otherwise the Upload doesn't work -> get stuck on a loading page
