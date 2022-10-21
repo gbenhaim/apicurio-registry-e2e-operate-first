@@ -25,39 +25,39 @@ const login = async function (page) {
 }
 
 const createRegistryInstance = async function (page, name) {
-  await page.locator('text=Create registry instance').click();
+  await page.getByText('Create registry instance', { exact: true }).click();
 
   await page.locator('#create-instance-name').fill(name);
-  await page.locator('text="Create"').click();
+  await page.getByText('Create', { exact: true }).click();
 
   // waiting to have the instance ready
-  const instanceLinkSelector = page.locator(`role=link[name="${name}"]`);
+  const instanceLinkSelector = page.getByRole('link', { name: `${name}` });
   await expect(instanceLinkSelector).toBeEnabled({ timeout: REGISTRY_CREATION_DELETION_TIMEOUT });
 }
 
 const deleteRegistryInstance = async function (page, name) {
-  const instanceLinkSelector = page.locator(`role=link[name="${name}"]`);
+  const instanceLinkSelector = page.getByRole('link', { name: `${name}` })
   const row = page.locator('tr', { has: instanceLinkSelector });
-  await row.locator('role=button[name="Actions"]').click();
+  await row.getByRole('button', { name: 'Actions' }).click();
 
   // Delete the created registry
-  await row.locator('text="Delete"').click();
+  await row.getByText('Delete', { exact: true }).click();
 
   await page.locator('#delete-instance-verify-name').fill(name);
   await page.locator('#delete-instance-verify-check').check();
 
-  const deleteLocator = page.locator('text="Delete"');
+  const deleteLocator = page.getByText('Delete', { exact: true });
   await expect(deleteLocator).toBeEnabled();
   await deleteLocator.click();
 
   // await for the instance to be deleted
-  await expect(page.locator(`text="${name}"`)).toHaveCount(0, { timeout: REGISTRY_CREATION_DELETION_TIMEOUT });
+  await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, { timeout: REGISTRY_CREATION_DELETION_TIMEOUT });
 }
 
 test('clean existing registry instances', async ({ page }) => {
   await login(page);
 
-  await expect(page.locator('text=Create registry instance')).toBeEnabled();
+  await expect(page.getByText('Create registry instance')).toBeEnabled();
 
   for (const el of await page.locator(`tr >> a`).elementHandles()) {
     const name = await el.textContent();
@@ -65,18 +65,21 @@ test('clean existing registry instances', async ({ page }) => {
   }
 });
 
-// test('create a registry instance and delete it', async ({ page }) => {
-//   await login(page);
+test('create a registry instance and delete it', async ({ page }) => {
+  await login(page);
 
-//   const testInstanceName = `test-instance-${TEST_UUID}`.substring(0, 32);
+  const testInstanceName = `test-instance-${TEST_UUID}`.substring(0, 32);
 
-//   await createRegistryInstance(page, testInstanceName);
+  await createRegistryInstance(page, testInstanceName);
 
-//   await deleteRegistryInstance(page, testInstanceName);
-// });
+  await deleteRegistryInstance(page, testInstanceName);
+});
 
 test('create a registry instance create an artifact and delete everything', async ({ page, browserName }) => {
-  test.skip(browserName === 'webkit' && process.platform === 'darwin', 'The artifact content is pasted with spurious characters');
+  test.skip(
+    (browserName === 'webkit' || browserName === 'firefox') &&
+    process.platform === 'darwin', 'The artifact content is pasted with spurious characters'
+  );
 
   await login(page);
 
@@ -84,9 +87,9 @@ test('create a registry instance create an artifact and delete everything', asyn
 
   await createRegistryInstance(page, testInstanceName);
 
-  await page.locator(`role=link[name="${testInstanceName}"]`).click();
+  await page.getByRole('link', { name: `${testInstanceName}` }).click();
 
-  const uploadButtonLocator = page.locator('text="Upload artifact"').first();
+  const uploadButtonLocator = page.getByText('Upload artifact', { exact: true }).first();
   await expect(uploadButtonLocator).toBeEnabled();
   await uploadButtonLocator.click();
 
@@ -98,8 +101,9 @@ test('create a registry instance create an artifact and delete everything', asyn
   // FIXME: otherwise the Upload doesn't work -> get stuck on a loading page
   await new Promise(resolve => setTimeout(resolve, 300));
 
-  await expect(page.locator('text="Upload"')).toBeEnabled({ timeout: 10000 });
-  await page.locator('text="Upload"').click();
+  const uploadLocator = page.getByText('Upload', { exact: true });
+  await expect(uploadLocator).toBeEnabled({ timeout: 10000 });
+  await uploadLocator.click();
 
   await expect(page.locator('h1 >> text="Swagger Petstore"')).toHaveCount(1, { timeout: 10000 });
 
