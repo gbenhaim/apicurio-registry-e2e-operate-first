@@ -24,7 +24,7 @@ jobs:
       run: npm ci
 
     # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
-    # Doesn't work properly with multiple OSes
+    # Doesn't work properly with Ubuntu + a specific browser to be identified
     # - name: Get installed Playwright version
     #   id: playwright-version
     #   run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
@@ -42,7 +42,7 @@ jobs:
 
     - name: Run Playwright tests
       env:
-        TEST_USERNAME: ${{ secrets.USERNAME }}
+        TEST_USERNAME: ${{ secrets.USERNAME }}-${{ matrix.os }}
         TEST_PASSWORD: ${{ secrets.PASSWORD }}
       run: npx playwright test
     - uses: actions/upload-artifact@v3
