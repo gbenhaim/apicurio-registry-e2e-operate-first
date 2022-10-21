@@ -75,7 +75,9 @@ test('clean existing registry instances', async ({ page }) => {
 //   await deleteRegistryInstance(page, testInstanceName);
 // });
 
-test('create a registry instance create an artifact and delete everything', async ({ page }) => {
+test('create a registry instance create an artifact and delete everything', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox' && process.platform === 'darwin', 'The artifact content is pasted with spurious characters');
+
   await login(page);
 
   const testInstanceName = `test-instance-${TEST_UUID}`.substring(0, 32);
@@ -92,10 +94,6 @@ test('create a registry instance create an artifact and delete everything', asyn
 
   // FIXME: fails on Safari locally
   await page.locator('#artifact-content').fill(artifactContent);
-
-  // // FIXME: this fails only on WebKit
-  // await page.locator('[data-testid="form-type-toggle"]').click();
-  // await page.locator('text="OpenAPI"').click();
 
   // FIXME: otherwise the Upload doesn't work -> get stuck on a loading page
   await new Promise(resolve => setTimeout(resolve, 300));

@@ -26,7 +26,8 @@ jobs:
     # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
     - name: Get installed Playwright version
       id: playwright-version
-      run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+      # run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+      run: echo "version=diabled" >> $GITHUB_OUTPUT
     - uses: actions/cache@v3
       id: playwright-cache
       with:
@@ -36,7 +37,7 @@ jobs:
           ${{ runner.os }}-playwright-
     - name: Install Playwright's dependencies
       if: steps.playwright-cache.outputs.cache-hit != 'true'
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps chromium chrome msedge firefox webkit
     # End of caching
 
     - name: Run Playwright tests
