@@ -24,18 +24,19 @@ jobs:
       run: npm ci
 
     # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
-    - name: Get installed Playwright version
-      id: playwright-version
-      run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3
-      id: playwright-cache
-      with:
-        path: '~/.cache/ms-playwright'
-        key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
-        restore-keys: |
-          ${{ runner.os }}-playwright-deps-
+    # Doesn't work properly with multiple OSes
+    # - name: Get installed Playwright version
+    #   id: playwright-version
+    #   run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+    # - uses: actions/cache@v3
+    #   id: playwright-cache
+    #   with:
+    #     path: '~/.cache/ms-playwright'
+    #     key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
+    #     restore-keys: |
+    #       ${{ runner.os }}-playwright-deps-
     - name: Install Playwright's dependencies
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      # if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps chromium chrome msedge firefox webkit
     # End of caching
 
