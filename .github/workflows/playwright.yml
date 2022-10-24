@@ -1,9 +1,9 @@
 name: Apicurio Registry Operate First E2E Tests
 on:
-  push:
-    branches: [ main ]
-  schedule:
-    - cron: "*/30 * * * *"
+  # push:
+  #   branches: [ main ]
+  # schedule:
+  #   - cron: "*/30 * * * *"
 
 jobs:
   test:

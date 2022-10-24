@@ -1,4 +1,4 @@
-name: Apicurio Registry Operate First E2E Tests
+name: DEBUG - Apicurio Registry Operate First E2E Tests
 on:
   push:
   #   branches: [ main ]
