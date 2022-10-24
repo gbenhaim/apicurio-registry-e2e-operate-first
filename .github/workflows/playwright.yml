@@ -54,12 +54,18 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 1
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: test-results/
+        retention-days: 1
 
     # Re-enable me on Monday
-    # - name: Google Chat Notification
-    #   uses: Co-qn/google-chat-notification@releases/v1
-    #   with:
-    #     name: Operate First E2E Test
-    #     url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-    #     status: ${{ job.status }}
-    #   if: failure()
+    - name: Google Chat Notification
+      uses: Co-qn/google-chat-notification@releases/v1
+      with:
+        name: Operate First E2E Test
+        url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+        status: ${{ job.status }}
+      if: failure()
