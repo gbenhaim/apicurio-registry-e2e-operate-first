@@ -1,9 +1,9 @@
 name: Apicurio Registry Operate First E2E Tests
 on:
-  # push:
-  #   branches: [ main ]
-  # schedule:
-  #   - cron: "*/30 * * * *"
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: "*/30 * * * *"
 
 jobs:
   test:
@@ -24,21 +24,24 @@ jobs:
       run: npm ci
 
     # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
-    # Doesn't work properly with Ubuntu + a specific browser to be identified
-    # - name: Get installed Playwright version
-    #   id: playwright-version
-    #   run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
-    # - uses: actions/cache@v3
-    #   id: playwright-cache
-    #   with:
-    #     path: '~/.cache/ms-playwright'
-    #     key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
-    #     restore-keys: |
-    #       ${{ runner.os }}-playwright-deps-
+    - name: Get installed Playwright version
+      id: playwright-version
+      run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
+    - uses: actions/cache@v3
+      id: playwright-cache
+      with:
+        path: '~/.cache/ms-playwright'
+        key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
+        restore-keys: |
+          ${{ runner.os }}-playwright-deps-
     - name: Install Playwright's dependencies
-      # if: steps.playwright-cache.outputs.cache-hit != 'true'
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps chromium chrome msedge firefox webkit
     # End of caching
+
+    # Some system dependencies are not cached
+    - name: Install Playwright's OS dependencies
+      run: npx playwright install-deps
 
     - name: Run Playwright tests
       env:
