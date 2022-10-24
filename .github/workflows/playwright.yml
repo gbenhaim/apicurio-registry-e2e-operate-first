@@ -1,7 +1,7 @@
 name: Apicurio Registry Operate First E2E Tests
 on:
-  # push:
-  #   branches: [ main ]
+  push:
+    branches: [ main ]
   # schedule:
   #   - cron: "*/30 * * * *"
 
@@ -42,9 +42,14 @@ jobs:
 
     - name: Run Playwright tests
       env:
-        TEST_USERNAME: ${{ secrets.USERNAME }}-${{ matrix.os }}
+        TEST_USERNAME: "${{ secrets.USERNAME }}-${{ matrix.os }}"
+        # TEST_USERNAME_PART2: ${{ matrix.os }}
         TEST_PASSWORD: ${{ secrets.PASSWORD }}
-      run: npx playwright test
+      run: |
+        echo ${TEST_USERNAME} | base64
+        exit 1
+        # export TEST_USERNAME="${TEST_USERNAME_PART1}-${TEST_USERNAME_PART2}"
+        npx playwright test
     - uses: actions/upload-artifact@v3
       if: always()
       with:
