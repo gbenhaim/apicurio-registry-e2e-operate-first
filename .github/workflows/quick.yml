@@ -27,9 +27,9 @@ jobs:
       id: playwright-cache
       with:
         path: '~/.cache/ms-playwright'
-        key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
+        key: '${{ runner.os }}-playwright-quick-deps-${{ steps.playwright-version.outputs.version }}'
         restore-keys: |
-          ${{ runner.os }}-playwright-deps-
+          ${{ runner.os }}-playwright-quick-deps-
     - name: Install Playwright's dependencies
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps chromium
@@ -37,7 +37,7 @@ jobs:
 
     - name: Run Playwright tests
       env:
-        TEST_USERNAME: "${{ secrets.USERNAME }}-${{ matrix.os }}"
+        TEST_USERNAME: ${{ secrets.USERNAME }}
         TEST_PASSWORD: ${{ secrets.PASSWORD }}
       run: npx playwright test --project chromium
     - uses: actions/upload-artifact@v3
@@ -46,12 +46,3 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 1
-
-    # Re-enable me on Monday
-    # - name: Google Chat Notification
-    #   uses: Co-qn/google-chat-notification@releases/v1
-    #   with:
-    #     name: Operate First E2E Test
-    #     url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-    #     status: ${{ job.status }}
-    #   if: failure()
