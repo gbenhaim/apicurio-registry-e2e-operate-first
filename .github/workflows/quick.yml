@@ -9,7 +9,7 @@ jobs:
   quick-test:
     continue-on-error: false
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
