@@ -34,10 +34,12 @@ jobs:
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps chromium chrome msedge firefox webkit
     # End of caching
+    # - name: Install Playwright's OS dependencies
+    #   run: npx playwright install-deps
 
     - name: Run Playwright tests
       env:
-        TEST_USERNAME: "${{ secrets.USERNAME }}-${{ matrix.os }}"
+        TEST_USERNAME: ${{ secrets.USERNAME }}
         TEST_PASSWORD: ${{ secrets.PASSWORD }}
       run: npx playwright test
     - uses: actions/upload-artifact@v3
