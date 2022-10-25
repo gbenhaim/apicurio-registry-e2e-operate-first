@@ -67,7 +67,8 @@ jobs:
         retention-days: 1
 
     - name: Google Chat Notification
-      uses: Co-qn/google-chat-notification@releases/v1
+      # release/v1
+      uses: Co-qn/google-chat-notification@b9227d9daa4638c9782a5bd16c4abb86268127a1
       with:
         name: Operate First E2E Test
         url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
