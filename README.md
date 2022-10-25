@@ -24,7 +24,7 @@ npx playwright install # Install all the Playwright dependencies and needed brow
 npx playwright test --project chromium # Executes the tests on a selected browser (`chromium` in this case)
 ```
 
-if you need to debug something failing you can use the Playwright console and have a Playwright helper available in console by executing:
+if you need to debug you can use the Playwright console and have a Playwright helper available in console by executing:
 
 ```bash
 PWDEBUG=1 npx playwright test --project chromium --debug
