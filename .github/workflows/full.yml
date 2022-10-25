@@ -11,66 +11,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  playwright:
+    uses: andreaTP/apicurio-gh-workflows/.github/workflows/playwright.yaml@playwright
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    continue-on-error: false
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-
-    # Caching Playwright from: https://github.com/microsoft/playwright/issues/7249
-    - name: Get installed Playwright version
-      id: playwright-version
-      run: echo "version=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3
-      id: playwright-cache
-      with:
-        path: '~/.cache/ms-playwright'
-        key: '${{ runner.os }}-playwright-deps-${{ steps.playwright-version.outputs.version }}'
-        restore-keys: |
-          ${{ runner.os }}-playwright-deps-
-    - name: Install Playwright's dependencies
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
-      run: npx playwright install --with-deps chromium chrome msedge firefox webkit
-    # End of caching
-
-    # Some system dependencies are not cached
-    - name: Install Playwright's OS dependencies
-      run: npx playwright install-deps
-
-    - name: Run Playwright tests
-      env:
-        TEST_USERNAME: "${{ secrets.USERNAME }}-${{ matrix.os }}"
-        TEST_PASSWORD: ${{ secrets.PASSWORD }}
-      run: npx playwright test
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: "playwright-report-${{ matrix.os }}"
-        path: playwright-report/
-        retention-days: 1
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: "test-results-${{ matrix.os }}"
-        path: test-results/
-        retention-days: 1
-
-    - name: Google Chat Notification
-      # release/v1
-      uses: Co-qn/google-chat-notification@b9227d9daa4638c9782a5bd16c4abb86268127a1
-      with:
-        name: Operate First E2E Test
-        url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-        status: ${{ job.status }}
-      if: failure()
+    with:
+      os: ${{ matrix.os }}
+      notify-on-failure: true
+    secrets:
+      username: "${{ secrets.USERNAME }}-${{ matrix.os }}"
+      password: ${{ secrets.PASSWORD }}
+      chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
