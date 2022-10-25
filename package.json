@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prettier-format": "prettier --config .prettierrc 'tests/**/*.ts' --write"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -12,6 +14,7 @@
     "@types/node": "^18.11.3",
     "@types/uuid": "^8.3.4",
     "dotenv": "^16.0.3",
+    "prettier": "^2.7.1",
     "uuid": "^9.0.0"
   }
 }

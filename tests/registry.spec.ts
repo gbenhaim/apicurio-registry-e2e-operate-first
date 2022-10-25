@@ -10,7 +10,9 @@ const REGISTRY_CREATION_DELETION_TIMEOUT = 20000;
 const TEST_UUID = uuid();
 
 const login = async function (page) {
-  await page.goto('http://apicurio-registry-mt-ui-mt-apicurio-apicurio-registry.apps.smaug.na.operate-first.cloud');
+  await page.goto(
+    'http://apicurio-registry-mt-ui-mt-apicurio-apicurio-registry.apps.smaug.na.operate-first.cloud'
+  );
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Sign in to operate-first-apicurio/);
@@ -22,7 +24,7 @@ const login = async function (page) {
 
   // check we landed on Registry
   await expect(page).toHaveTitle(/Apicurio : Registry/);
-}
+};
 
 const createRegistryInstance = async function (page, name) {
   await page.getByText('Create registry instance', { exact: true }).click();
@@ -32,11 +34,13 @@ const createRegistryInstance = async function (page, name) {
 
   // waiting to have the instance ready
   const instanceLinkSelector = page.getByRole('link', { name: `${name}` });
-  await expect(instanceLinkSelector).toBeEnabled({ timeout: REGISTRY_CREATION_DELETION_TIMEOUT });
-}
+  await expect(instanceLinkSelector).toBeEnabled({
+    timeout: REGISTRY_CREATION_DELETION_TIMEOUT
+  });
+};
 
 const deleteRegistryInstance = async function (page, name) {
-  const instanceLinkSelector = page.getByRole('link', { name: `${name}` })
+  const instanceLinkSelector = page.getByRole('link', { name: `${name}` });
   const row = page.locator('tr', { has: instanceLinkSelector });
   await row.getByRole('button', { name: 'Actions' }).click();
 
@@ -51,8 +55,10 @@ const deleteRegistryInstance = async function (page, name) {
   await deleteLocator.click();
 
   // await for the instance to be deleted
-  await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, { timeout: REGISTRY_CREATION_DELETION_TIMEOUT });
-}
+  await expect(page.getByText(`${name}`, { exact: true })).toHaveCount(0, {
+    timeout: REGISTRY_CREATION_DELETION_TIMEOUT
+  });
+};
 
 test('clean existing registry instances', async ({ page }) => {
   await login(page);
@@ -75,10 +81,14 @@ test('create a registry instance and delete it', async ({ page }) => {
   await deleteRegistryInstance(page, testInstanceName);
 });
 
-test('create a registry instance create an artifact and delete everything', async ({ page, browserName }) => {
+test('create a registry instance create an artifact and delete everything', async ({
+  page,
+  browserName
+}) => {
   test.skip(
     (browserName === 'webkit' || browserName === 'firefox') &&
-    process.platform === 'darwin', 'The artifact content is pasted with spurious characters'
+      process.platform === 'darwin',
+    'The artifact content is pasted with spurious characters'
   );
 
   await login(page);
@@ -89,23 +99,29 @@ test('create a registry instance create an artifact and delete everything', asyn
 
   await page.getByRole('link', { name: `${testInstanceName}` }).click();
 
-  const uploadButtonLocator = page.getByText('Upload artifact', { exact: true }).first();
+  const uploadButtonLocator = page
+    .getByText('Upload artifact', { exact: true })
+    .first();
   await expect(uploadButtonLocator).toBeEnabled();
   await uploadButtonLocator.click();
 
-  const artifactContent = fs.readFileSync('./resources/petstore.yaml', { encoding: 'utf-8' });
+  const artifactContent = fs.readFileSync('./resources/petstore.yaml', {
+    encoding: 'utf-8'
+  });
 
   // FIXME: fails on Safari
   await page.locator('#artifact-content').fill(artifactContent);
 
   // FIXME: otherwise the Upload doesn't work -> get stuck on a loading page
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
   const uploadLocator = page.getByText('Upload', { exact: true });
   await expect(uploadLocator).toBeEnabled({ timeout: 10000 });
   await uploadLocator.click();
 
-  await expect(page.locator('h1 >> text="Swagger Petstore"')).toHaveCount(1, { timeout: 10000 });
+  await expect(page.locator('h1 >> text="Swagger Petstore"')).toHaveCount(1, {
+    timeout: 10000
+  });
 
   await page.locator(`a >> text="Registry Instances"`).click();
 
