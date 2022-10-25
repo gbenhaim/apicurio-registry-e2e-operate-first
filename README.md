@@ -5,13 +5,18 @@ This repository contains the User Interface End to End tests for the Operate Fir
 
 ## Build & Run
 
- - [Typescript](https://www.typescriptlang.org/): language since it's the closer to the UI developers ecosystem
+Tools:
+
+ - [Typescript](https://www.typescriptlang.org/): close to the UI developers ecosystem
  - [NPM](https://www.npmjs.com/): build tool
  - [Node](https://nodejs.org/en/): runtime
  - [Playwright](https://playwright.dev/): framework for UI testing
  - [GH Action](https://docs.github.com/en/actions): infrastructure
 
-To get started make sure you have an NPM and Node version that is compatible (npm `8.X`, node `16.X`) installed and available on the `PATH`.
+Local requirements:
+
+- `npm`: `8.X`
+- `node`: `16.X`
 
 ```bash
 npm install # Install all the needed Node dependencies
