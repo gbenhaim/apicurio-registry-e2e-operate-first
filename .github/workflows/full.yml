@@ -1,9 +1,14 @@
-name: Apicurio Registry Operate First E2E Tests
+name: Full - Apicurio Registry Operate First E2E Tests
 on:
   push:
     branches: [ main ]
   schedule:
     - cron: "*/30 * * * *"
+
+concurrency:
+  # Only run once this workflow
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -61,7 +66,6 @@ jobs:
         path: test-results/
         retention-days: 1
 
-    # Re-enable me on Monday
     - name: Google Chat Notification
       uses: Co-qn/google-chat-notification@releases/v1
       with:
