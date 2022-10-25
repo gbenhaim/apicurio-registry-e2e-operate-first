@@ -36,21 +36,15 @@ This repository uses GitHub Actions as infrastructure to run the tests agains pu
 There are currently 2 CI running on the `main` branch:
 
  - `quick.yml` faster feedback loop
- run the tests only using the `chromium` browser on Linux
+
+ run the tests using only the `chromium` browser on Linux
+
  - `full.yml` wide coverage of OSes/browsers
- run the tests for full coverage including:
 
-  - `mac`
-  - `linux`
-  - `windows`
-
-and the browsers:
-
-  - `chromium`
-  - `chrome`
-  - `webkit`
-  - `firefox`
-  - `edge`
+run the tests for full coverage including:
+  `mac`, `linux`, `windows`
+and multiple browsers:
+  `chromium`, `chrome`, `webkit`, `firefox`, `edge`
 
 The CI only runs on the `main` branch to avoid sharing secrets on branches and forks.
 
