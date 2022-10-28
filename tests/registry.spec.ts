@@ -115,6 +115,7 @@ test('create a registry instance create an artifact and delete everything', asyn
   const artifactContent = fs.readFileSync('./resources/petstore.yaml', {
     encoding: 'utf-8'
   });
+  console.debug("Pet Store DATA: ", artifactContent);
 
   // FIXME: fails on Safari
   await page.locator('#artifact-content').fill(artifactContent);
