@@ -1,0 +1,79 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: tests-pipeline-
+spec:
+  params:
+    - name: git-url
+      value: https://github.com/Apicurio/apicurio-registry-e2e-operate-first.git
+    - name: revision
+      value: main
+  workspaces:
+    - name: ws-pipeline
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  pipelineSpec:
+    params:
+      - name: git-url
+        type: string
+      - name: revision
+        type: string
+    workspaces:
+      - name: ws-pipeline
+    tasks:
+      - name: clone-repository
+        params:
+          - name: url
+            value: $(params.git-url)
+          - name: revision
+            value: $(params.revision)
+        workspaces:
+          - name: output
+            workspace: ws-pipeline
+        taskRef:
+          bundle: quay.io/redhat-appstudio/appstudio-tasks:510fa6e99f1fa1f816c96354bbaf1ad155c6d9c3-1
+          name: git-clone
+      - name: run-tests
+        params:
+          - name: options
+            value: "--project chromium"
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+        runAfter:
+          - clone-repository
+        taskSpec:
+          params:
+            - name: options
+          workspaces:
+            - name: ws
+          steps:
+            - name: run-tests
+              image: mcr.microsoft.com/playwright:v1.27.1-focal
+              env:
+                - name: CI
+                  value: "1"
+              script: |
+                        cd $(workspaces.ws.path)
+                        npm ci
+                        npx playwright test $(params.options)
+      - name: report-results
+        runAfter:
+          - run-tests
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+        taskSpec:
+            workspaces:
+              - name: ws
+            steps:
+              - name: echo
+                image: registry.access.redhat.com/ubi8/ubi:latest
+                script: |
+                          cat $(workspaces.ws.path)/ret
