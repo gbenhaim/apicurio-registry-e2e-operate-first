@@ -5,7 +5,8 @@ metadata:
   name: run-playwright
 spec:
   params:
-    - name: project
+    - name: projects
+    - name: deps
     - name: cred-secret-name
   workspaces:
     - name: ws
@@ -28,5 +29,5 @@ spec:
       script: |
                 cd $(workspaces.ws.path)
                 npm ci
-                npx playwright install --with-deps $(params.project)
-                npx playwright test --project $(params.project)
+                npx playwright install --with-deps "$(params.deps)"
+                npx playwright test --project "$(params.projects)"

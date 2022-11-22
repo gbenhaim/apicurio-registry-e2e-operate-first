@@ -39,10 +39,27 @@ spec:
         taskRef:
           bundle: quay.io/redhat-appstudio/appstudio-tasks:510fa6e99f1fa1f816c96354bbaf1ad155c6d9c3-1
           name: git-clone
-      - name: run-tests-on-chrome
+      - name: chrome
         params:
-          - name: project
+          - name: projects
+            value: "Google Chrome"
+          - name: deps
             value: chrome
+          - name: cred-secret-name
+            value: operate-first-cred
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+        runAfter:
+          - clone-repository
+        taskRef:
+          name: run-playwright
+      - name: edge
+        params:
+          - name: projects
+            value: "Microsoft Edge"
+          - name: deps
+            value: msedge
           - name: cred-secret-name
             value: operate-first-cred
         workspaces:
@@ -54,7 +71,8 @@ spec:
           name: run-playwright
       - name: report-results
         runAfter:
-          - run-tests-on-chrome
+          - chrome
+          - edge
         workspaces:
           - name: ws
             workspace: ws-pipeline
