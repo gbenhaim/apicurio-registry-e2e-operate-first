@@ -1,0 +1,32 @@
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-playwright
+spec:
+  params:
+    - name: project
+    - name: cred-secret-name
+  workspaces:
+    - name: ws
+  steps:
+    - name: run-tests
+      image: mcr.microsoft.com/playwright:v1.27.1-focal
+      env:
+        - name: CI
+          value: "1"
+        - name: TEST_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: $(params.cred-secret-name)
+              key: TEST_USERNAME
+        - name: TEST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: $(params.cred-secret-name)
+              key: TEST_PASSWORD
+      script: |
+                cd $(workspaces.ws.path)
+                npm ci
+                npx playwright install --with-deps $(params.project)
+                npx playwright test --project $(params.project)

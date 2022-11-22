@@ -39,33 +39,22 @@ spec:
         taskRef:
           bundle: quay.io/redhat-appstudio/appstudio-tasks:510fa6e99f1fa1f816c96354bbaf1ad155c6d9c3-1
           name: git-clone
-      - name: run-tests
+      - name: run-tests-on-chrome
         params:
-          - name: options
-            value: "--project chromium"
+          - name: project
+            value: chrome
+          - name: cred-secret-name
+            value: operate-first-cred
         workspaces:
           - name: ws
             workspace: ws-pipeline
         runAfter:
           - clone-repository
-        taskSpec:
-          params:
-            - name: options
-          workspaces:
-            - name: ws
-          steps:
-            - name: run-tests
-              image: mcr.microsoft.com/playwright:v1.27.1-focal
-              env:
-                - name: CI
-                  value: "1"
-              script: |
-                        cd $(workspaces.ws.path)
-                        npm ci
-                        npx playwright test $(params.options)
+        taskRef:
+          name: run-playwright
       - name: report-results
         runAfter:
-          - run-tests
+          - run-tests-on-chrome
         workspaces:
           - name: ws
             workspace: ws-pipeline
@@ -76,4 +65,4 @@ spec:
               - name: echo
                 image: registry.access.redhat.com/ubi8/ubi:latest
                 script: |
-                          cat $(workspaces.ws.path)/ret
+                          echo "Uploading test logs"
