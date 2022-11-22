@@ -27,7 +27,14 @@ spec:
               name: $(params.cred-secret-name)
               key: TEST_PASSWORD
       script: |
-                cd $(workspaces.ws.path)
+                # Multiple instances of this task can share a workspace
+                # Create a private copy of the git repo including the tests
+
+                tmpdir=$(mktemp -d)
+                cp -R $(workspaces.ws.path)/. "$tmpdir"
+                cd "$tmpdir"
+                ls -l
                 npm ci
                 npx playwright install --with-deps "$(params.deps)"
                 npx playwright test --project "$(params.projects)"
+                ls -l
