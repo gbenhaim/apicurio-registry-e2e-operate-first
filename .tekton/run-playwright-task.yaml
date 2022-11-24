@@ -10,6 +10,7 @@ spec:
     - name: cred-secret-name
   workspaces:
     - name: ws
+    - name: test-results-ws
   steps:
     - name: run-tests
       image: mcr.microsoft.com/playwright:v1.27.1-focal
@@ -33,8 +34,14 @@ spec:
                 tmpdir=$(mktemp -d)
                 cp -R $(workspaces.ws.path)/. "$tmpdir"
                 cd "$tmpdir"
-                ls -l
+
                 npm ci
                 npx playwright install --with-deps "$(params.deps)"
-                npx playwright test --project "$(params.projects)"
+                ret=0
+                npx playwright test --project "$(params.projects)" || ret="$?"
+                
                 ls -l
+                mv playwright-report "$(workspaces.test-results-ws.path)"
+                mv test-results "$(workspaces.test-results-ws.path)"
+
+                exit "$ret"

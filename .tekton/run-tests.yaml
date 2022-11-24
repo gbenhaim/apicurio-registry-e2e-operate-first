@@ -36,6 +36,7 @@ spec:
         workspaces:
           - name: output
             workspace: ws-pipeline
+            subPath: repo
         taskRef:
           bundle: quay.io/redhat-appstudio/appstudio-tasks:510fa6e99f1fa1f816c96354bbaf1ad155c6d9c3-1
           name: git-clone
@@ -50,6 +51,10 @@ spec:
         workspaces:
           - name: ws
             workspace: ws-pipeline
+            subPath: repo
+          - name: test-results-ws
+            workspace: ws-pipeline
+            subPath: tests-results/chrome
         runAfter:
           - clone-repository
         taskRef:
@@ -65,22 +70,88 @@ spec:
         workspaces:
           - name: ws
             workspace: ws-pipeline
+            subPath: repo
+          - name: test-results-ws
+            workspace: ws-pipeline
+            subPath: tests-results/edge
         runAfter:
           - clone-repository
         taskRef:
           name: run-playwright
-      - name: report-results
-        runAfter:
-          - chrome
-          - edge
+      - name: firefox
+        params:
+          - name: projects
+            value: firefox
+          - name: deps
+            value: firefox
+          - name: cred-secret-name
+            value: operate-first-cred
         workspaces:
           - name: ws
             workspace: ws-pipeline
+            subPath: repo
+          - name: test-results-ws
+            workspace: ws-pipeline
+            subPath: tests-results/firefox
+        runAfter:
+          - clone-repository
+        taskRef:
+          name: run-playwright
+      - name: chromium
+        params:
+          - name: projects
+            value: chromium
+          - name: deps
+            value: chromium
+          - name: cred-secret-name
+            value: operate-first-cred
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+            subPath: repo
+          - name: test-results-ws
+            workspace: ws-pipeline
+            subPath: tests-results/chromium
+        runAfter:
+          - clone-repository
+        taskRef:
+          name: run-playwright
+      - name: webkit
+        params:
+          - name: projects
+            value: webkit
+          - name: deps
+            value: webkit
+          - name: cred-secret-name
+            value: operate-first-cred
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+            subPath: repo
+          - name: test-results-ws
+            workspace: ws-pipeline
+            subPath: tests-results/webkit
+        runAfter:
+          - clone-repository
+        taskRef:
+          name: run-playwright
+    finally:
+      - name: report-results
+        params:
+          - name: pipeline-run-name
+            value: $(context.pipelineRun.name)
+        workspaces:
+          - name: ws
+            workspace: ws-pipeline
+            subPath: tests-results
         taskSpec:
+            params:
+              - name: pipeline-run-name
             workspaces:
               - name: ws
             steps:
               - name: echo
-                image: registry.access.redhat.com/ubi8/ubi:latest
+                image: quay.io/gbenhaim0/rsync-image:latest
                 script: |
                           echo "Uploading test logs"
+                          rsync -av "$(workspaces.ws.path)/" rsync://${FILE_SERVER_PORT_873_TCP_ADDR}/files/$(params.pipeline-run-name)
